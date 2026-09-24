@@ -2,9 +2,13 @@
 # sleeper_fantasy.star and nfl_scores.star to your Tidbyt on a schedule, so
 # the device stays fresh without your computer needing to be on.
 #
+# Expected repo layout — each app lives in its own directory named after it:
+#   sleeper_fantasy/sleeper_fantasy.star
+#   nfl_scores/nfl_scores.star
+#
 # SETUP (one-time):
-#   1. Create a new GitHub repo (can be private) and push BOTH
-#      sleeper_fantasy.star and nfl_scores.star to its root.
+#   1. Create a new GitHub repo (can be private). Create the two folders
+#      above and put each .star file in its matching folder.
 #   2. Save this file as: .github/workflows/update-tidbyt.yml
 #   3. In the repo: Settings -> Secrets and variables -> Actions -> New repository secret
 #        - Add TIDBYT_API_TOKEN  (your Tidbyt API token)
@@ -18,7 +22,7 @@
 # every minute — during busy periods a run can also be delayed further.
 # For live game-day scores expect occasional lag, not to-the-second accuracy.
 
-name: Update NFL App
+name: Update Tidbyt Apps
 
 on:
   schedule:
@@ -46,10 +50,25 @@ jobs:
           sudo mv pixlet /usr/local/bin/pixlet
           pixlet version
 
+      - name: Render Sleeper Fantasy app
+        working-directory: sleeper_fantasy
+        run: pixlet render sleeper_fantasy.star
+
+      - name: Push Sleeper Fantasy to Tidbyt
+        working-directory: sleeper_fantasy
+        run: |
+          pixlet push \
+            --api-token "${{ secrets.TIDBYT_API_TOKEN }}" \
+            "${{ secrets.TIDBYT_DEVICE_ID }}" \
+            sleeper_fantasy.webp \
+            --installation-id sleeperfantasy
+
       - name: Render NFL Scores app
+        working-directory: nfl_scores
         run: pixlet render nfl_scores.star
 
       - name: Push NFL Scores to Tidbyt
+        working-directory: nfl_scores
         run: |
           pixlet push \
             --api-token "${{ secrets.TIDBYT_API_TOKEN }}" \
