@@ -18,7 +18,7 @@
 # every minute — during busy periods a run can also be delayed further.
 # For live game-day scores expect occasional lag, not to-the-second accuracy.
 
-name: Update Tidbyt Apps
+name: Update NFL App
 
 on:
   schedule:
