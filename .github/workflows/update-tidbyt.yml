@@ -1,10 +1,10 @@
-# GitHub Actions workflow: automatically re-renders and pushes
-# sleeper_fantasy.star to your Tidbyt on a schedule, so the device stays
-# fresh without your computer needing to be on.
+# GitHub Actions workflow: automatically re-renders and pushes both
+# sleeper_fantasy.star and nfl_scores.star to your Tidbyt on a schedule, so
+# the device stays fresh without your computer needing to be on.
 #
 # SETUP (one-time):
-#   1. Create a new GitHub repo (can be private) and push sleeper_fantasy.star
-#      to its root.
+#   1. Create a new GitHub repo (can be private) and push BOTH
+#      sleeper_fantasy.star and nfl_scores.star to its root.
 #   2. Save this file as: .github/workflows/update-tidbyt.yml
 #   3. In the repo: Settings -> Secrets and variables -> Actions -> New repository secret
 #        - Add TIDBYT_API_TOKEN  (your Tidbyt API token)
@@ -13,15 +13,16 @@
 #      schedule below, and you can also trigger it manually from the
 #      "Actions" tab in GitHub ("Run workflow" button).
 #
-# NOTE: GitHub's schedule triggers are "best effort" — during busy periods
-# a run can be delayed several minutes past its scheduled time. For live
-# game-day scores expect occasional lag, not to-the-second accuracy.
+# NOTE: GitHub's schedule triggers are "best effort" and won't reliably run
+# more often than every 5 minutes, even if the cron expression asks for
+# every minute — during busy periods a run can also be delayed further.
+# For live game-day scores expect occasional lag, not to-the-second accuracy.
 
-name: Update Tidbyt (Sleeper Fantasy)
+name: Update Tidbyt Apps
 
 on:
   schedule:
-    - cron: "*/5 * * * *"  # every 5 minutes (GitHub's minimum interval)
+    - cron: "*/5 * * * *"  # every 5 minutes (GitHub's realistic minimum interval)
   workflow_dispatch: {}  # lets you trigger it manually from the Actions tab
 
 jobs:
@@ -45,13 +46,24 @@ jobs:
           sudo mv pixlet /usr/local/bin/pixlet
           pixlet version
 
-      - name: Render app
+      - name: Render Sleeper Fantasy app
         run: pixlet render sleeper_fantasy.star
 
-      - name: Push to Tidbyt
+      - name: Push Sleeper Fantasy to Tidbyt
         run: |
           pixlet push \
             --api-token "${{ secrets.TIDBYT_API_TOKEN }}" \
             "${{ secrets.TIDBYT_DEVICE_ID }}" \
             sleeper_fantasy.webp \
             --installation-id sleeperfantasy
+
+      - name: Render NFL Scores app
+        run: pixlet render nfl_scores.star
+
+      - name: Push NFL Scores to Tidbyt
+        run: |
+          pixlet push \
+            --api-token "${{ secrets.TIDBYT_API_TOKEN }}" \
+            "${{ secrets.TIDBYT_DEVICE_ID }}" \
+            nfl_scores.webp \
+            --installation-id nflscores
