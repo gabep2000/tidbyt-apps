@@ -21,7 +21,7 @@ name: Update Tidbyt (Sleeper Fantasy)
 
 on:
   schedule:
-    - cron: "*/5 * * * *"  # every 5 minutes (GitHub's minimum interval)
+    - cron: "*/1 * * * *"  # every 1 minutes (GitHub's minimum interval)
   workflow_dispatch: {}  # lets you trigger it manually from the Actions tab
 
 jobs:
@@ -54,4 +54,4 @@ jobs:
             --api-token "${{ secrets.TIDBYT_API_TOKEN }}" \
             "${{ secrets.TIDBYT_DEVICE_ID }}" \
             sleeper_fantasy.webp \
-            --installation-id sleeper_fantasy
+            --installation-id sleeperfantasy
